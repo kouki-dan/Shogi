@@ -1,11 +1,15 @@
 #!/usr/local/bin/python3
 
 import os.path
+from collections import defaultdict
+import uuid
+
 import tornado.auth
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import tornado.websocket
 
 from tornado.options import define, options
 
@@ -15,52 +19,73 @@ class HomeHandler(tornado.web.RequestHandler):
   def get(self):
     self.render("index.html")
 
+class Room(object):
+  def __init__(self, persons):
+    self.persons = persons
+    self.id = uuid.uuid4()
+    for person in persons:
+      person.joining_room = self
+      person.write_message({"aa":"aa"})
+
+
+class PasswordExistError(Exception):
+  def __init__(self, value):
+    self.value = value
+  def __str__(self):
+    return repr(self.value)
+
+class Lobby(object):
+  def __init__(self):
+    self.passwords = defaultdict(list)
+  def add(self, message, person):
+    password = message["password"]
+    self.passwords[password].append(person)
+    if(len(self.passwords[password]) >= 2):
+      room = Room(self.passwords[password])
+
+
 class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
-    waiters = set()
-    def allow_draft76(self):
-        # for iOS 5.0 Safari
-        return True
+  rooms = {}
+  lobby = Lobby()
+  waiters = set()
+  def __init__(self, *args, **kwargs):
+    super(ShogiSocketHandler, self).__init__(*args, **kwargs)
+    self.joining_room = None
 
-    def open(self):
-        ShogiSocketHandler.waiters.add(self)
+  def allow_draft76(self):
+    # for iOS 5.0 Safari
+    return True
 
-    def on_close(self):
-        ShogiSocketHandler.waiters.remove(self)
+  def open(self):
+    ShogiSocketHandler.waiters.add(self)
 
-    @classmethod
-    def update_cache(cls, chat):
-        cls.cache.append(chat)
-        if len(cls.cache) > cls.cache_size:
-            cls.cache = cls.cache[-cls.cache_size:]
+  def on_close(self):
+    ShogiSocketHandler.waiters.remove(self)
 
-    @classmethod
-    def send_updates(cls, chat):
-        logging.info("sending message to %d waiters", len(cls.waiters))
-        for waiter in cls.waiters:
-            try:
-                waiter.write_message(chat)
-            except:
-                logging.error("Error sending message", exc_info=True)
+  @classmethod
+  def send_updates(cls, chat):
+    logging.info("sending message to %d waiters", len(cls.waiters))
+    for waiter in cls.waiters:
+      try:
+        waiter.write_message(chat)
+      except:
+        logging.error("Error sending message", exc_info=True)
 
-    def on_message(self, message):
-        logging.info("got message %r", message)
-        parsed = tornado.escape.json_decode(message)
-        chat = {
-            "id": str(uuid.uuid4()),
-            "body": parsed["body"],
-            }
-        chat["html"] = tornado.escape.to_basestring(
-            self.render_string("message.html", message=chat))
+  def on_message(self, message):
+    message = tornado.escape.json_decode(message)
+    if(message["type"] == "initialize"):
+      ShogiSocketHandler.lobby.add(message,self)
+    else:
+      room.on_message(message)
 
-        ChatSocketHandler.update_cache(chat)
-        ChatSocketHandler.send_updates(chat)
+    
 
 
 class Application(tornado.web.Application):
   def __init__(self):
     handlers = [
         (r"/", HomeHandler),
-        (r"/shogisocket", 
+        (r"/shogisocket", ShogiSocketHandler),
         ]
     settings = dict(
         template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -71,8 +96,6 @@ class Application(tornado.web.Application):
         debug=True,
         )
     tornado.web.Application.__init__(self, handlers, **settings)
-
-
 
 
 def main():
