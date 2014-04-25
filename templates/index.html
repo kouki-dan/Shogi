@@ -5,6 +5,20 @@
 Main
 {% end %}
 
-{% block body %}
-将棋盤
+{% block head %}
+<link rel="stylesheet" href="{{ static_url("css/style.css") }}">
+<script>
+STATIC_URL = "{{ static_url("") }}";
+</script>
+<script type="text/javascript" src="{{ static_url("js/shogi.js") }}"></script>
 {% end %}
+
+
+{% block body %}
+<h1>将棋盤</h1>
+
+<div id="shogi">
+
+</div>
+{% end %}
+
