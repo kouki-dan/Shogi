@@ -20,6 +20,9 @@ class HomeHandler(tornado.web.RequestHandler):
     self.render("index.html")
 
 class Room(object):
+  """
+socket.send('{"type":"initialize","password":"aa"}')
+  """  
   def __init__(self, persons):
     self.persons = persons
     self.id = uuid.uuid4()
@@ -27,12 +30,6 @@ class Room(object):
       person.joining_room = self
       person.write_message({"aa":"aa"})
 
-
-class PasswordExistError(Exception):
-  def __init__(self, value):
-    self.value = value
-  def __str__(self):
-    return repr(self.value)
 
 class Lobby(object):
   def __init__(self):
@@ -42,6 +39,10 @@ class Lobby(object):
     self.passwords[password].append(person)
     if(len(self.passwords[password]) >= 2):
       room = Room(self.passwords[password])
+      del self.passwords[password]
+  def remove(self, exited_person):
+    pass
+#TODO
 
 
 class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
@@ -60,6 +61,10 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
     ShogiSocketHandler.waiters.add(self)
 
   def on_close(self):
+    if self.joining_room:
+      self.joining_room.remove(self)
+    else:
+      lobby.remove(self)
     ShogiSocketHandler.waiters.remove(self)
 
   @classmethod
@@ -74,11 +79,10 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
   def on_message(self, message):
     message = tornado.escape.json_decode(message)
     if(message["type"] == "initialize"):
+      self.password = message["password"]
       ShogiSocketHandler.lobby.add(message,self)
     else:
       room.on_message(message)
-
-    
 
 
 class Application(tornado.web.Application):
@@ -106,5 +110,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
