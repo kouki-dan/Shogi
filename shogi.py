@@ -19,6 +19,7 @@ class HomeHandler(tornado.web.RequestHandler):
   def get(self):
     self.render("index.html")
 
+
 class Room(object):
   """
 socket.send('{"type":"initialize","password":"aa"}')
