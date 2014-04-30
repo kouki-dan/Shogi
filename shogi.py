@@ -27,10 +27,21 @@ socket.send('{"type":"initialize","password":"aa"}')
   def __init__(self, persons):
     self.persons = persons
     self.id = uuid.uuid4()
-    for person in persons:
+    for person in self.persons:
       person.joining_room = self
       person.write_message({"aa":"aa"})
 
+  def remove(self, exited_person):
+    for person in self.persons:
+      if not person == exited_person:
+        person.write_message({"aa":"Someone exited"})
+        self.persons.remove(exited_person)
+
+  def output_now_status(self):
+    print("ROOM:"+str(self.id))
+    for person in self.persons:
+      print(person)
+    print("---------")
 
 class Lobby(object):
   def __init__(self):
@@ -41,18 +52,30 @@ class Lobby(object):
     if(len(self.passwords[password]) >= 2):
       room = Room(self.passwords[password])
       del self.passwords[password]
+      ShogiSocketHandler.rooms.append(room)
   def remove(self, exited_person):
-    pass
-#TODO
+    self.passwords[exited_person.password].remove(exited_person)
+
+  def output_now_status(self):
+    print("Lobby")
+    for password in self.passwords:
+      print("Password:" + password)
+      for person in self.passwords[password]:
+        print(person)
+    print("==================")
+  
 
 
 class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
-  rooms = {}
+  rooms = []
   lobby = Lobby()
   waiters = set()
   def __init__(self, *args, **kwargs):
     super(ShogiSocketHandler, self).__init__(*args, **kwargs)
     self.joining_room = None
+    ShogiSocketHandler.lobby.output_now_status()
+    for room in ShogiSocketHandler.rooms:
+      room.output_now_status()
 
   def allow_draft76(self):
     # for iOS 5.0 Safari
