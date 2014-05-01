@@ -88,7 +88,7 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
     if self.joining_room:
       self.joining_room.remove(self)
     else:
-      lobby.remove(self)
+      ShogiSocketHandler.lobby.remove(self)
     ShogiSocketHandler.waiters.remove(self)
 
   @classmethod
