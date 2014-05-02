@@ -22,7 +22,7 @@ class HomeHandler(tornado.web.RequestHandler):
 
 class Room(object):
   """
-socket.send('{"type":"initialize","password":"aa"}')
+    socket.send('{"type":"initialize","password":"aa"}')
   """  
   def __init__(self, persons):
     self.persons = persons
