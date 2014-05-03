@@ -29,7 +29,10 @@ class Room(object):
     self.id = uuid.uuid4()
     for person in self.persons:
       person.joining_room = self
-      person.write_message({"aa":"aa"})
+
+    self.broadcast({"type":"joined room",
+      "members":[person.id for person in self.persons],
+      })
 
   def remove(self, exited_person):
     for person in self.persons:
@@ -39,11 +42,13 @@ class Room(object):
 
   def on_message(self, message, sender):
     """
+    socket.send('{"type":"move koma","password":"aa"}')
     """
     if(message.get("type") == "move koma"):
       self.movedKoma(message, sender)
 
   def movedKoma(self, message, sender):
+    #TODO:
     self.broadcast(message, sender=sender)
 
   def broadcast(self, message, sender=None):
@@ -67,6 +72,7 @@ class Lobby(object):
       room = Room(self.passwords[password])
       del self.passwords[password]
       ShogiSocketHandler.rooms.append(room)
+
   def remove(self, exited_person):
     self.passwords[exited_person.password].remove(exited_person)
 
@@ -86,6 +92,7 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
   waiters = set()
   def __init__(self, *args, **kwargs):
     super(ShogiSocketHandler, self).__init__(*args, **kwargs)
+    self.id = str(uuid.uuid4())
     self.joining_room = None
     self.initialized = False
     ShogiSocketHandler.lobby.output_now_status()
@@ -122,7 +129,12 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
       #TODO:Add function which can be initialized only once when completed
       self.password = message["password"]
       ShogiSocketHandler.lobby.add(message,self)
+      self.write_message({"type":"initialize",
+        "status":"complete",
+        "id":self.id,
+        })
       self.initialized = True
+
     if(self.joining_room and self.initialized):
       self.joining_room.on_message(message,sender=self)
 
