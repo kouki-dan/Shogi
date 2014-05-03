@@ -114,15 +114,6 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
     ShogiSocketHandler.waiters.remove(self)
     print(str(self) + " exited")
 
-  @classmethod
-  def send_updates(cls, chat):
-    logging.info("sending message to %d waiters", len(cls.waiters))
-    for waiter in cls.waiters:
-      try:
-        waiter.write_message(chat)
-      except:
-        logging.error("Error sending message", exc_info=True)
-
   def on_message(self, message):
     message = tornado.escape.json_decode(message)
     if(message["type"] == "initialize" and not self.initialized ):
