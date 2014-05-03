@@ -37,6 +37,20 @@ class Room(object):
         person.write_message({"aa":"Someone exited"})
         self.persons.remove(exited_person)
 
+  def on_message(self, message, sender):
+    """
+    """
+    if(message.get("type") == "move koma"):
+      self.movedKoma(message, sender)
+
+  def movedKoma(self, message, sender):
+    self.broadcast(message, sender=sender)
+
+  def broadcast(self, message, sender=None):
+    for person in self.persons:
+      if not person == sender:
+        person.write_message(message)
+
   def output_now_status(self):
     print("ROOM:"+str(self.id))
     for person in self.persons:
@@ -73,6 +87,7 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
   def __init__(self, *args, **kwargs):
     super(ShogiSocketHandler, self).__init__(*args, **kwargs)
     self.joining_room = None
+    self.initialized = False
     ShogiSocketHandler.lobby.output_now_status()
     for room in ShogiSocketHandler.rooms:
       room.output_now_status()
@@ -90,6 +105,7 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
     else:
       ShogiSocketHandler.lobby.remove(self)
     ShogiSocketHandler.waiters.remove(self)
+    print(str(self) + " exited")
 
   @classmethod
   def send_updates(cls, chat):
@@ -102,11 +118,13 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
 
   def on_message(self, message):
     message = tornado.escape.json_decode(message)
-    if(message["type"] == "initialize"):
+    if(message["type"] == "initialize" and not self.initialized ):
+      #TODO:Add function which can be initialized only once when completed
       self.password = message["password"]
       ShogiSocketHandler.lobby.add(message,self)
-    else:
-      room.on_message(message)
+      self.initialized = True
+    if(self.joining_room and self.initialized):
+      self.joining_room.on_message(message,sender=self)
 
 
 class Application(tornado.web.Application):
