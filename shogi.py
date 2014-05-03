@@ -49,7 +49,11 @@ class Room(object):
 
   def movedKoma(self, message, sender):
     #TODO:
-    self.broadcast(message, sender=sender)
+    send_data = {}
+    send_data["type"] = "move koma"
+    send_data["sender_id"] = sender.id
+    send_data["koma_data"] = message["koma_data"]
+    self.broadcast(send_data, sender=sender)
 
   def broadcast(self, message, sender=None):
     for person in self.persons:
