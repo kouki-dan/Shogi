@@ -113,7 +113,7 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
   def on_close(self):
     if self.joining_room:
       self.joining_room.remove(self)
-    else:
+    elif self.initialized:
       ShogiSocketHandler.lobby.remove(self)
     ShogiSocketHandler.waiters.remove(self)
     print(str(self) + " exited")
