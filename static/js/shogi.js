@@ -75,12 +75,10 @@ Koma.prototype.draggable = function(){
       }
       that.elm.style.top = e.pageY + offsetY + "px";
       that.elm.style.left = e.pageX + offsetX + "px";
-      console.log("OK");
 
     },true);
     window.addEventListener("mouseup",function(e){
       dragging = false;
-      console.log("up");
     },true);
 
   }).call(this);
@@ -134,4 +132,11 @@ window.addEventListener("load",function(){
 
 },true);
 
+
+var uuid = (function(){
+    var S4 = function() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    }   
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4() +S4());
+})();
 
