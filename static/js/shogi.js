@@ -41,6 +41,8 @@ var Koma = function(koma_type){
 
   this.elm = document.createElement("div");
   this.elm.appendChild(this.koma);
+
+  this.draggable();
 };
 Koma.prototype.turnOver = function(){
   this.promoted = !this.promoted;
@@ -52,7 +54,9 @@ Koma.prototype.turnOver = function(){
     //TODO:promoted_komaの位置にkomaを挿入
     this.elm = this.koma;
   }
-  
+};
+Koma.prototype.draggable = function(){
+  //TODO:Dragできるようにする処理
 };
 
 
