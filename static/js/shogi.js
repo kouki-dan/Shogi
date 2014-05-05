@@ -27,6 +27,7 @@ var Koma = function(koma_type){
   if(koma_type == undefined){
     throw "koma_type "+koma_type+" is not defined"
   }
+  this.id = uuid();
   this.koma_img_path = STATIC_URL + "images/" + koma_type[0] + ".png";
   this.koma = new Image();
   this.koma.width = 80
@@ -66,8 +67,6 @@ Koma.prototype.draggable = function(){
       dragging = true;
       offsetX = (that.elm.getBoundingClientRect().left + scrollX) - e.pageX;
       offsetY = (that.elm.getBoundingClientRect().top + scrollY) - e.pageY;
-
-      console.log(offsetY);
     },true);
     window.addEventListener("mousemove",function(e){
       if(!dragging){
@@ -122,21 +121,34 @@ window.addEventListener("load",function(){
   var koma = new Koma("pawn");
   document.body.appendChild(koma.elm);
 
-
-
   var url = "ws://" + location.host + "/shogisocket";
   socket = new WebSocket(url);
   socket.onmessage = function(event) {
     console.log(JSON.parse(event.data));
+    if(event["type"] == "initialize"){
+      if(event["status"] == "complete"){
+        console.log("Connected");
+      }
+      else{
+        alert("Connection Failed");
+      }
+    }
   }
+  var password = uuid();
+  socket.onopen = function(){
+    socket.send(JSON.stringify({
+      "type":"initialize",
+      "password":password
+    }));
+  };
 
 },true);
 
 
-var uuid = (function(){
+var uuid = function(){
     var S4 = function() {
         return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-    }   
+    }
     return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4() +S4());
-})();
+}
 
