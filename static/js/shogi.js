@@ -56,7 +56,34 @@ Koma.prototype.turnOver = function(){
   }
 };
 Koma.prototype.draggable = function(){
-  //TODO:Dragできるようにする処理
+  (function(){
+    var that = this;
+    var dragging = false;
+    var x,y,offsetX,offsetY;
+    this.elm.style.position = "absolute";
+    this.elm.addEventListener("mousedown",function(e){
+      e.preventDefault();
+      dragging = true;
+      offsetX = (that.elm.getBoundingClientRect().left + scrollX) - e.pageX;
+      offsetY = (that.elm.getBoundingClientRect().top + scrollY) - e.pageY;
+
+      console.log(offsetY);
+    },true);
+    window.addEventListener("mousemove",function(e){
+      if(!dragging){
+        return;
+      }
+      that.elm.style.top = e.pageY + offsetY + "px";
+      that.elm.style.left = e.pageX + offsetX + "px";
+      console.log("OK");
+
+    },true);
+    window.addEventListener("mouseup",function(e){
+      dragging = false;
+      console.log("up");
+    },true);
+
+  }).call(this);
 };
 
 
