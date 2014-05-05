@@ -38,7 +38,9 @@ var Koma = function(koma_type){
   this.promoted_koma.src = this.promoted_koma_img_path;
 
   this.promoted = false;
-  this.elm = this.koma;
+
+  this.elm = document.createElement("div");
+  this.elm.appendChild(this.koma);
 };
 Koma.prototype.turnOver = function(){
   this.promoted = !this.promoted;
