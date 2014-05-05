@@ -5,3 +5,9 @@ p{
   letter-spacing:0px;
 }
 
+.nonedrag{
+  user-select:none;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -webkit-user-drag:none;
+}
