@@ -58,6 +58,12 @@ Koma.prototype.turnOver = function(){
 };
 Koma.prototype.dragend = function(e){
   console.log("dragend");
+  socket.send(JSON.stringify({
+    "type":"move koma",
+    "koma_id":this.id,
+    "move_to_x":this.elm.style.left,
+    "move_to_y":this.elm.style.top,
+  }));
 };
 Koma.prototype.draggable = function(){
   (function(){
@@ -154,9 +160,26 @@ window.addEventListener("load",function(){
 
 
 var uuid = function(){
-    var S4 = function() {
-        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
-    }
-    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4() +S4());
+  var S4 = function() {
+    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+  }
+  return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4() +S4());
+}
+
+function getQueryString()
+{
+  var result = {};
+  if(1 < window.location.search.length){
+    var query = window.location.search.substring( 1 );
+    var parameters = query.split('&');
+
+    for(var i = 0; i < parameters.length; i++){
+      var element = parameters[ i ].split( '=' );
+      var paramName = decodeURIComponent( element[ 0 ] );
+      var paramValue = decodeURIComponent( element[ 1 ] );
+      result[ paramName ] = paramValue;
+    }
+  }
+  return result;
 }
 
