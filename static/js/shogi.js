@@ -143,7 +143,7 @@ window.addEventListener("load",function(){
     if(data["type"] == "initialize"){
       if(data["status"] == "complete"){
         console.log("Connected");
-        document.getElementById("url").innerText = ""+location.href+"?id="+data["password"];
+        document.getElementById("url").value = ""+location.href+"?id="+data["password"];
       }
       else{
         alert("Connection Failed");
