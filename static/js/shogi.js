@@ -139,16 +139,20 @@ window.addEventListener("load",function(){
   socket = new WebSocket(url);
   socket.onmessage = function(event) {
     console.log(JSON.parse(event.data));
-    if(event["type"] == "initialize"){
-      if(event["status"] == "complete"){
+    var data = JSON.parse(event.data);
+    if(data["type"] == "initialize"){
+      if(data["status"] == "complete"){
         console.log("Connected");
+        document.getElementById("url").innerText = ""+location.href+"?id="+data["password"];
       }
       else{
         alert("Connection Failed");
       }
     }
   }
-  var password = uuid();
+  var query = getQueryString();
+  
+  var password = query["id"] || uuid();
   socket.onopen = function(){
     socket.send(JSON.stringify({
       "type":"initialize",

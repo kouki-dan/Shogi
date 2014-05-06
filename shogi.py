@@ -48,11 +48,13 @@ class Room(object):
       self.movedKoma(message, sender)
 
   def movedKoma(self, message, sender):
-    #TODO:
     send_data = {}
     send_data["type"] = "move koma"
     send_data["sender_id"] = sender.id
-    send_data["koma_data"] = message["koma_data"]
+    send_data["koma_id"] = message["koma_id"]
+    send_data["move_to_x"] = message["move_to_x"]
+    send_data["move_to_y"] = message["move_to_y"]
+    print(str(send_data))
     self.broadcast(send_data, sender=sender)
 
   def broadcast(self, message, sender=None):
@@ -79,6 +81,8 @@ class Lobby(object):
 
   def remove(self, exited_person):
     self.passwords[exited_person.password].remove(exited_person)
+    if(len(self.passwords[exited_person.password]) == 0):
+      del self.passwords[exited_person.password]
 
   def output_now_status(self):
     print("Lobby")
@@ -123,10 +127,11 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
     if(message["type"] == "initialize" and not self.initialized ):
       #TODO:Add function which can be initialized only once when completed
       self.password = message["password"]
-      ShogiSocketHandler.lobby.add(message,self)
+      ShogiSocketHandler.lobby.add(message, self)
       self.write_message({"type":"initialize",
         "status":"complete",
         "id":self.id,
+        "password":self.password,
         })
       self.initialized = True
 
