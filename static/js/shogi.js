@@ -149,6 +149,11 @@ window.addEventListener("load",function(){
         alert("Connection Failed");
       }
     }
+    if(data["type"] == "move koma"){
+      //TODO:move many koma 
+      koma.elm.style.top = data["move_to_y"];
+      koma.elm.style.left = data["move_to_x"];
+    }
   }
   var query = getQueryString();
   
