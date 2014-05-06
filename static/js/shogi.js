@@ -56,6 +56,9 @@ Koma.prototype.turnOver = function(){
     this.elm = this.koma;
   }
 };
+Koma.prototype.dragend = function(e){
+  console.log("dragend");
+};
 Koma.prototype.draggable = function(){
   (function(){
     var that = this;
@@ -77,6 +80,11 @@ Koma.prototype.draggable = function(){
 
     },true);
     window.addEventListener("mouseup",function(e){
+      if(dragging){
+       if(that.dragend){
+         that.dragend(e);
+       }
+      }
       dragging = false;
     },true);
 

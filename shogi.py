@@ -42,7 +42,7 @@ class Room(object):
 
   def on_message(self, message, sender):
     """
-    socket.send('{"type":"move koma","password":"aa"}')
+      socket.send('{"type":"move koma","password":"aa"}')
     """
     if(message.get("type") == "move koma"):
       self.movedKoma(message, sender)
