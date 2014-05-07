@@ -49,12 +49,10 @@ var Koma = function(koma_type){
 Koma.prototype.turnover = function(){
   this.promoted = !this.promoted;
   if(this.promoted){
-    //TODO:komaの位置にpromoted_komaを挿入
     this.elm.appendChild(this.promoted_koma);
     this.elm.removeChild(this.koma);
   }
   else{
-    //TODO:promoted_komaの位置にkomaを挿入
     this.elm.appendChild(this.koma);
     this.elm.removeChild(this.promoted_koma);
   }
