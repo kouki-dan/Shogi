@@ -27,7 +27,7 @@ var Koma = function(koma_type){
   if(koma_type == undefined){
     throw "koma_type "+koma_type+" is not defined"
   }
-  this.id = uuid();
+  this.id = Koma.generateId();
   this.koma_img_path = STATIC_URL + "images/" + koma_type[0] + ".png";
   this.koma = new Image();
   this.koma.width = 80
@@ -96,6 +96,11 @@ Koma.prototype.draggable = function(){
 
   }).call(this);
 };
+Koma.generateId = function(){
+  Koma._nowId++;
+  return Koma._nowId.toString();
+}
+Koma._nowId = 0;
 
 
 function makeImg(path, width, height){
