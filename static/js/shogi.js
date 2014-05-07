@@ -39,6 +39,7 @@ var Koma = function(koma_type){
   this.promoted_koma.src = this.promoted_koma_img_path;
 
   this.promoted = false;
+  this.direction = false;
 
   this.elm = document.createElement("div");
   this.elm.appendChild(this.koma);
@@ -59,7 +60,16 @@ Koma.prototype.turnover = function(){
   }
 };
 Koma.prototype.turnback = function(){
-  alert("turnback");
+  if(this.direction){
+    this.elm.style.webkitTransform = "rotate(0deg)";
+    this.elm.style.mozTransform = "rotate(0deg)";
+  }
+  else{
+    this.elm.style.webkitTransform = "rotate(180deg)";
+    this.elm.style.mozTransform = "rotate(180deg)";
+  }
+  this.direction = !this.direction;
+
 };
 Koma.prototype.dragend = function(e){
   console.log("dragend");
