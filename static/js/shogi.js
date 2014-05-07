@@ -20,9 +20,6 @@ var KOMA_TYPES = {
   "pawn":["pawn","promoted_pawn"] //歩
 }
 
-
-
-
 var Koma = function(koma_type){
   if(typeof koma_type == "string"){
     koma_type = KOMA_TYPES[koma_type]
@@ -48,16 +45,21 @@ var Koma = function(koma_type){
 
   this.draggable();
 };
-Koma.prototype.turnOver = function(){
+Koma.prototype.turnover = function(){
   this.promoted = !this.promoted;
   if(this.promoted){
     //TODO:komaの位置にpromoted_komaを挿入
-    this.elm = this.promoted_koma;
+    this.elm.appendChild(this.promoted_koma);
+    this.elm.removeChild(this.koma);
   }
   else{
     //TODO:promoted_komaの位置にkomaを挿入
-    this.elm = this.koma;
+    this.elm.appendChild(this.koma);
+    this.elm.removeChild(this.promoted_koma);
   }
+};
+Koma.prototype.turnback = function(){
+  alert("turnback");
 };
 Koma.prototype.dragend = function(e){
   console.log("dragend");
@@ -72,7 +74,7 @@ Koma.prototype.draggable = function(){
   (function(){
     var that = this;
     var dragging = false;
-    var x,y,offsetX,offsetY;
+    var x, y, offsetX, offsetY;
     this.elm.style.position = "absolute";
     this.elm.addEventListener("mousedown",function(e){
       e.preventDefault();
@@ -87,7 +89,6 @@ Koma.prototype.draggable = function(){
       var x = e.pageX + offsetX + "px";
       var y = e.pageY + offsetY + "px";
       that.moveTo(x, y);
-
     },true);
     window.addEventListener("mouseup",function(e){
       if(dragging){
@@ -97,7 +98,6 @@ Koma.prototype.draggable = function(){
       }
       dragging = false;
     },true);
-
   }).call(this);
 };
 Koma.prototype.moveTo = function(x,y){
@@ -137,10 +137,32 @@ window.addEventListener("load",function(){
   board.style.width = "720px";
   board.style.height = "720px";
 
+  var turns = document.createElement("div");
+  turns.style.position = "fixed";
+  turns.style.bottom = "0px";
+  turns.style.right = "0px";
+  var turnover = document.createElement("div");
+  turnover.innerText = "ひっくり返る";
+  turnover.addEventListener("click",function(){
+    if(Koma.prevMovedKoma){
+      Koma.prevMovedKoma.turnover();
+    }
+  },true);
+  turns.appendChild(turnover);
+  var turnback = document.createElement("div");
+  turnback.innerText = "うらぎる";
+  turnback.addEventListener("click",function(){
+    if(Koma.prevMovedKoma){
+      Koma.prevMovedKoma.turnback();
+    }
+  },true);
+  
+  turns.appendChild(turnback);
+
+  document.body.appendChild(turns);
+
   var img = makeImg(grid_path,700,80);
-
   board.appendChild(img);
-
   for(var y = 0; y < 9; y++){
     for(var x = 0; x < 9; x++){
       var img = makeImg(grid_path);
