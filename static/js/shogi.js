@@ -13,12 +13,15 @@ var KOMA_TYPES = {
   "king":["king","king"], //王
   "rook":["rook","promoted_rook"], //飛車
   "bishop":["bishop","promoted_bishop"], //角
-  "gold_general":["gold","gold"], //金
-  "silver_general":["silver","promoted_silver"], //銀
+  "gold":["gold","gold"], //金
+  "silver":["silver","promoted_silver"], //銀
   "knight":["knight","promoted_knight"], //馬
   "lance":["lance","promoted_lance"], //香車
   "pawn":["pawn","promoted_pawn"] //歩
 }
+
+
+
 
 var Koma = function(koma_type){
   if(typeof koma_type == "string"){
@@ -81,8 +84,9 @@ Koma.prototype.draggable = function(){
       if(!dragging){
         return;
       }
-      that.elm.style.top = e.pageY + offsetY + "px";
-      that.elm.style.left = e.pageX + offsetX + "px";
+      var x = e.pageX + offsetX + "px";
+      var y = e.pageY + offsetY + "px";
+      that.moveTo(x, y);
 
     },true);
     window.addEventListener("mouseup",function(e){
@@ -96,6 +100,17 @@ Koma.prototype.draggable = function(){
 
   }).call(this);
 };
+Koma.prototype.moveTo = function(x,y){
+  this.elm.style.left = x;
+  this.elm.style.top = y;
+  if(this != Koma.prevMovedKoma){
+    Koma.prevMovedKoma = this;
+    Koma.prevZIndex++;
+    this.elm.style.zIndex = Koma.prevZIndex;
+  }
+};
+Koma.prevMovedKoma;
+Koma.prevZIndex = 0;
 Koma.generateId = function(){
   Koma._nowId++;
   return Koma._nowId.toString();
@@ -137,8 +152,27 @@ window.addEventListener("load",function(){
   board.appendChild(img);
  
 
-  var koma = new Koma("pawn");
-  document.body.appendChild(koma.elm);
+  var koma_field = [
+  ["lance","knight","silver","gold","king","gold","silver","knight","lance"],
+  ["","bishop","","","","","","rook",""],
+  ["pawn","pawn","pawn","pawn","pawn","pawn","pawn","pawn","pawn"],
+  [],
+  [],
+  [],
+  ["pawn","pawn","pawn","pawn","pawn","pawn","pawn","pawn","pawn"],
+  ["","rook","","","","","","bishop",""],
+  ["lance","knight","silver","gold","king","gold","silver","knight","lance"]];
+
+  var koma_map = {}
+  for(var y = 0; y < koma_field.length; y++){
+    for(var x = 0; x < koma_field[y].length; x++){
+      if(koma_field[y][x] != ""){
+        var koma = new Koma(koma_field[y][x]);
+        document.body.appendChild(koma.elm);
+        koma_map[koma.id] = koma;
+      }
+    }
+  }
 
   var url = "ws://" + location.host + "/shogisocket";
   socket = new WebSocket(url);
@@ -156,8 +190,8 @@ window.addEventListener("load",function(){
     }
     if(data["type"] == "move koma"){
       //TODO:move many koma 
-      koma.elm.style.top = data["move_to_y"];
-      koma.elm.style.left = data["move_to_x"];
+      var koma = koma_map[data["koma_id"]];
+      koma.moveTo(data["move_to_x"],data["move_to_y"]);
     }
   }
   var query = getQueryString();
