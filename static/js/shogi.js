@@ -39,15 +39,23 @@ var Koma = function(koma_type){
   this.promoted_koma.src = this.promoted_koma_img_path;
 
   this.promoted = false;
-  this.direction = false;
+  this.direction = true;
 
   this.elm = document.createElement("div");
   this.elm.appendChild(this.koma);
 
   this.draggable();
 };
-Koma.prototype.turnover = function(){
-  this.promoted = !this.promoted;
+Koma.prototype.turnover = function(promoted){
+  var send = true;
+  if(promoted != undefined){
+    this.promoted = promoted;
+    send = false;
+  }
+  else{
+    this.promoted = !this.promoted;
+  }
+
   if(this.promoted){
     this.elm.appendChild(this.promoted_koma);
     this.elm.removeChild(this.koma);
@@ -56,8 +64,26 @@ Koma.prototype.turnover = function(){
     this.elm.appendChild(this.koma);
     this.elm.removeChild(this.promoted_koma);
   }
+
+  if(send){
+    socket.send(JSON.stringify({
+      "type":"turnover koma",
+      "koma_id":this.id,
+      "promoted":this.promoted,
+    }));
+  }
+  
 };
-Koma.prototype.turnback = function(){
+Koma.prototype.turnback = function(direction){
+  var send = true;
+  if(direction != undefined){
+    this.direction = direction;
+    send = false;
+  }
+  else{
+    this.direction = !this.direction;
+  }
+
   if(this.direction){
     this.elm.style.webkitTransform = "rotate(0deg)";
     this.elm.style.mozTransform = "rotate(0deg)";
@@ -66,8 +92,14 @@ Koma.prototype.turnback = function(){
     this.elm.style.webkitTransform = "rotate(180deg)";
     this.elm.style.mozTransform = "rotate(180deg)";
   }
-  this.direction = !this.direction;
 
+  if(send){
+    socket.send(JSON.stringify({
+      "type":"turnback koma",
+      "koma_id":this.id,
+      "direction":this.direction,
+    }));
+  }
 };
 Koma.prototype.dragend = function(e){
   console.log("dragend");
@@ -223,6 +255,17 @@ window.addEventListener("load",function(){
       var koma = koma_map[data["koma_id"]];
       koma.moveTo(data["move_to_x"],data["move_to_y"]);
     }
+    if(data["type"] == "turnover koma"){
+      //TODO:move many koma 
+      var koma = koma_map[data["koma_id"]];
+      koma.turnover(data["promoted"]);
+    }
+    if(data["type"] == "turnback koma"){
+      //TODO:move many koma 
+      var koma = koma_map[data["koma_id"]];
+      koma.turnback(data["direction"]);
+    }
+    
   }
   var query = getQueryString();
   

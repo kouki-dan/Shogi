@@ -46,6 +46,10 @@ class Room(object):
     """
     if(message.get("type") == "move koma"):
       self.movedKoma(message, sender)
+    if(message.get("type") == "turnover koma"):
+      self.turnoverKoma(message, sender)
+    if(message.get("type") == "turnback koma"):
+      self.turnbackKoma(message, sender)
 
   def movedKoma(self, message, sender):
     send_data = {}
@@ -56,6 +60,25 @@ class Room(object):
     send_data["move_to_y"] = message["move_to_y"]
     print(str(send_data))
     self.broadcast(send_data, sender=sender)
+
+  def turnoverKoma(self, message, sender):
+    send_data = {}
+    send_data["type"] = "turnover koma"
+    send_data["sender_id"] = sender.id
+    send_data["koma_id"] = message["koma_id"]
+    send_data["promoted"] = message["promoted"]
+    print(str(send_data))
+    self.broadcast(send_data, sender=sender)
+
+  def turnbackKoma(self, message, sender):
+    send_data = {}
+    send_data["type"] = "turnback koma"
+    send_data["sender_id"] = sender.id
+    send_data["koma_id"] = message["koma_id"]
+    send_data["direction"] = message["direction"]
+    print(str(send_data))
+    self.broadcast(send_data, sender=sender)
+
 
   def broadcast(self, message, sender=None):
     for person in self.persons:
