@@ -139,6 +139,12 @@ Koma.prototype.moveTo = function(x,y){
     this.elm.style.zIndex = Koma.prevZIndex;
   }
 };
+Koma.prototype.getPosition = function(){
+  return {
+    "x":this.elm.style.left,
+    "y":this.elm.style.top,
+  };
+};
 Koma.prevMovedKoma;
 Koma.prevZIndex = 0;
 Koma.generateId = function(){
