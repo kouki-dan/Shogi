@@ -222,6 +222,11 @@ window.addEventListener("load",function(){
         var koma = new Koma(koma_field[y][x]);
         document.body.appendChild(koma.elm);
         koma_map[koma.id] = koma;
+
+        koma.moveTo(80*x+10+"px", 80*y+200+"px");
+        if(y <= 3){
+          koma.turnback(false);
+        }
       }
     }
   }
