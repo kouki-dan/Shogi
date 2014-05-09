@@ -1,14 +1,4 @@
 
-var updater = {
-    socket: null,
-
-    start: function() {
-    },
-
-    showMessage: function(message) {
-    }
-};
-
 var KOMA_TYPES = {
   "king":["king","king"], //王
   "rook":["rook","promoted_rook"], //飛車
