@@ -251,6 +251,11 @@ window.addEventListener("load",function(){
         alert("Connection Failed");
       }
     }
+    if(data["type"] == "joined room"){
+      if(data["parent"] == false){
+        socket.send(JSON.stringify({"type":"request koma's position"}))
+      }
+    }
     if(data["type"] == "move koma"){
       //TODO:move many koma 
       var koma = koma_map[data["koma_id"]];
@@ -268,12 +273,20 @@ window.addEventListener("load",function(){
     }
     if(data["type"] == "request koma's position"){
       var komas_position = {};
+      komas_position["positions"] = {}
       for(var koma_id in koma_map){
-        komas_position[koma_id] = koma_map[koma_id];
+        komas_position["positions"][koma_id] = koma_map[koma_id].getPosition();
       }
-      socket.send(JSON.stringify(koma_position));
+      komas_position["type"] = "koma's position data";
+      socket.send(JSON.stringify(komas_position));
     }
-    
+    if(data["type"] == "koma's position data"){
+      for(var koma_id in data["positions"]){
+        var x = data["positions"][koma_id]["x"];
+        var y = data["positions"][koma_id]["y"];
+        koma_map[koma_id].moveTo(x, y);
+      }
+    }
   }
   var query = getQueryString();
   

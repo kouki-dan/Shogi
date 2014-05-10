@@ -27,11 +27,19 @@ class Room(object):
   def __init__(self, persons):
     self.persons = persons
     self.id = uuid.uuid4()
+    self.parent = None
     for person in self.persons:
+      if self.parent == None:
+        self.parent = person
       person.joining_room = self
 
     self.broadcast({"type":"joined room",
       "members":[person.id for person in self.persons],
+      "parent":False,
+      },sender=self.parent)
+    self.parent.write_message({"type":"joined room",
+      "members":[person.id for person in self.persons],
+      "parent":True,
       })
 
   def remove(self, exited_person):
@@ -50,6 +58,10 @@ class Room(object):
       self.turnoverKoma(message, sender)
     if(message.get("type") == "turnback koma"):
       self.turnbackKoma(message, sender)
+    if(message.get("type") == "request koma's position"):
+      self.parent.write_message({"type":"request koma's position"})
+    if(message.get("type") == "koma's position data"):
+      self.broadcast(message, sender=sender)
 
   def movedKoma(self, message, sender):
     send_data = {}
