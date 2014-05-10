@@ -21,9 +21,6 @@ class HomeHandler(tornado.web.RequestHandler):
 
 
 class Room(object):
-  """
-    socket.send('{"type":"initialize","password":"aa"}')
-  """  
   def __init__(self, persons):
     self.persons = persons
     self.id = uuid.uuid4()
@@ -49,9 +46,6 @@ class Room(object):
         self.persons.remove(exited_person)
 
   def on_message(self, message, sender):
-    """
-      socket.send('{"type":"move koma","password":"aa"}')
-    """
     if(message.get("type") == "move koma"):
       self.movedKoma(message, sender)
     if(message.get("type") == "turnover koma"):
@@ -159,7 +153,6 @@ class ShogiSocketHandler(tornado.websocket.WebSocketHandler):
   def on_message(self, message):
     message = tornado.escape.json_decode(message)
     if(message["type"] == "initialize" and not self.initialized ):
-      #TODO:Add function which can be initialized only once when completed
       self.password = message["password"]
       ShogiSocketHandler.lobby.add(message, self)
       self.write_message({"type":"initialize",
