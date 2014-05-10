@@ -266,6 +266,13 @@ window.addEventListener("load",function(){
       var koma = koma_map[data["koma_id"]];
       koma.turnback(data["direction"]);
     }
+    if(data["type"] == "request koma's position"){
+      var komas_position = {};
+      for(var koma_id in koma_map){
+        komas_position[koma_id] = koma_map[koma_id];
+      }
+      socket.send(JSON.stringify(koma_position));
+    }
     
   }
   var query = getQueryString();

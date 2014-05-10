@@ -79,7 +79,6 @@ class Room(object):
     print(str(send_data))
     self.broadcast(send_data, sender=sender)
 
-
   def broadcast(self, message, sender=None):
     for person in self.persons:
       if not person == sender:
