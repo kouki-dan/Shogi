@@ -257,17 +257,14 @@ window.addEventListener("load",function(){
       }
     }
     if(data["type"] == "move koma"){
-      //TODO:move many koma 
       var koma = koma_map[data["koma_id"]];
       koma.moveTo(data["move_to_x"],data["move_to_y"]);
     }
     if(data["type"] == "turnover koma"){
-      //TODO:move many koma 
       var koma = koma_map[data["koma_id"]];
       koma.turnover(data["promoted"]);
     }
     if(data["type"] == "turnback koma"){
-      //TODO:move many koma 
       var koma = koma_map[data["koma_id"]];
       koma.turnback(data["direction"]);
     }
